@@ -1,0 +1,246 @@
+getgenv().Fist = false;
+getgenv().Strength = false;
+getgenv().Vitality = false;
+getgenv().Speed = false;
+getgenv().BuyEndurance = false;
+getgenv().BuyWeight = false;
+getgenv().AutoSell = false;
+getgenv().AutoBuyArea = false;
+getgenv().Equippet = false;
+getgenv().AutoBuyPet = false;
+getgenv().AutoRebirth = false;
+getgenv().AutoAscension = false;
+getgenv().AutoUpgradeBossShop = false;
+getgenv().Boss = false;
+getgenv().AutoSellPet = false;
+getgenv().AutoEvolve = false;
+
+
+local PetStatsTable = {}
+local Functions = {};
+local IsA = game.IsA
+local Plr = game.Players.LocalPlayer
+local Chr = Plr.Character
+local HP = Chr:FindFirstChild("HumanoidRootPart") or Chr:WaitForChild("HumanoidRootPart")
+local PetTier = nil;
+
+local Pets = game:GetService("Players").LocalPlayer.PlayerGui.Main.Frame.FrameYY.FrameXY.Pet.Pet.Frame
+
+
+function Functions:AutoSellPet()
+    for i,v in pairs(Pets:GetDescendants()) do 
+        if IsA(v,"IntValue") and v.Name == "SlotNumber" then 
+            if v.Value >= 3 then
+                game:GetService("ReplicatedStorage").Network.Port1:FireServer("SellItem","Pet",v.Value)
+            end
+        end
+    end
+end
+
+local Eggs = {}
+local GetTiers = {}
+for i,v in pairs(game.Workspace:GetDescendants()) do 
+    if IsA(v,"Model") and v.Name:match("Tier") then 
+        local ChangeName = v.Name:gsub(v.Name,"Tier")
+        table.insert(GetTiers,ChangeName)
+    end
+end
+for i = 1,#GetTiers do 
+    local kc = GetTiers[i]
+    table.insert(Eggs,tostring(kc ..  i))
+end
+
+
+
+
+
+function Functions:Fist()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("Click")
+end
+
+function Functions:Strength()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("Punching",workspace.PowerTrainingFolder.Model)
+end
+
+function Functions:Vitality()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("Vitality")
+end
+
+function Functions:Speed()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("Running")
+end
+
+function Functions:AutoBuyEndurance()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("PurchaseAll","Endurance")
+end
+
+function Functions:AutoBuyWeight()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("PurchaseAll","Strength")
+end
+
+function Functions:AutoSell()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("SellEnergy")
+end
+
+function Functions:AutoBuyArea()
+    for i,v in pairs(game.Workspace:GetDescendants()) do 
+        if IsA(v,"TouchTransmitter") and IsA(v.Parent,"BasePart") and v.Parent.Name:match("Area") then
+            if HP then 
+                firetouchinterest(HP,v.Parent,1)
+                wait()
+                firetouchinterest(HP,v.Parent,0)
+            end
+        end
+    end
+end
+
+
+function Functions:AutoEquipBestPet()
+    for i,v in pairs(Pets:GetDescendants()) do 
+        if IsA(v,"IntValue") and v.Name == "SlotNumber" then 
+            if v.Parent:FindFirstChild("Equipped") then 
+                if v.Parent:FindFirstChild("Equipped").Value == true and v.Value >= 3 then 
+                    unequipPet()
+                    wait(0.5)
+                    EquipBestPet()
+                end
+            end
+        end
+    end
+end
+
+function Functions:AutoBuyPet()
+    if PetTier == nil then 
+        return
+    end
+    game:GetService("ReplicatedStorage").Network.Port1:FireServer("PurchaseCrate",PetTier,1)
+end
+
+function Functions:Evolve()
+    game:GetService("ReplicatedStorage").Network.Port1:FireServer("Evolve")
+end
+
+
+function Functions:AutoRebirth()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("Purchase","Rank")
+end
+
+function Functions:AutoAscension()
+    return game:GetService("ReplicatedStorage").Network.Port1:FireServer("Purchase","Ascension")
+end
+
+
+
+
+
+
+local library = loadstring(game:HttpGet(('https://raw.githubusercontent.com/AikaV3rm/UiLib/master/Lib.lua')))()
+
+local w = library:CreateWindow("L.L.S(V.1.5)") -- Creates the window
+
+local b = w:CreateFolder("Farms") -- Creates the folder(U will put here your buttons,etc)
+
+b:Toggle("Auto Fist",function(t)
+    getgenv().Fist = t
+end)
+
+b:Toggle("Auto Strength",function(t)
+    getgenv().Strength = t 
+end)
+
+b:Toggle("Auto Vitality",function(t)
+    getgenv().Vitality = t
+end)
+
+b:Toggle("Auto Speed",function(t)
+    getgenv().Speed = t
+end)
+
+b:Toggle("Auto Buy Endurance",function(t)
+    getgenv().BuyEndurance = t 
+end)
+
+b:Toggle("Auto Buy Weight",function(t)
+    getgenv().BuyWeight = t
+end)
+
+b:Toggle("Auto Sell",function(t)
+    getgenv().AutoSell = t
+end)
+
+b:Toggle("Auto Buy Area",function(t)
+    getgenv().AutoBuyArea = t
+end)
+
+
+b:Toggle("Auto Rebirth",function(t)
+    getgenv().AutoRebirth = t
+end)
+
+b:Toggle("Auto Ascension",function(t)
+    getgenv().AutoAscension = t
+end)
+
+local w2 = library:CreateWindow("Other")
+local b2 = w2:CreateFolder("Pet")
+
+b2:Toggle("Auto Buy Pet",function(t)
+    getgenv().AutoBuyPet = t 
+end)
+
+b2:Dropdown("Select Egg",Eggs,true,function(t)
+    PetTier = t
+end)
+
+b2:Toggle("Auto Sell Bad Pet",function(t)
+    getgenv().AutoSellPet = t 
+end)
+
+b2:Toggle("Auto Evolve Pet",function(t)
+    getgenv().AutoEvolve = t
+end)
+
+b2:DestroyGui()
+
+while wait() do 
+   if getgenv().Fist then 
+       Functions:Fist()
+   end
+   if getgenv().Strength then 
+       Functions:Strength()
+   end
+   if getgenv().Vitality then 
+       Functions:Vitality()
+   end
+   if getgenv().Speed then 
+        Functions:Speed()   
+   end
+   if getgenv().BuyEndurance then 
+       Functions:AutoBuyEndurance()
+   end
+   if getgenv().BuyWeight then 
+       Functions:AutoBuyWeight()
+   end
+   if getgenv().AutoSell then 
+       Functions:AutoSell()
+   end
+   if getgenv().AutoBuyArea then 
+       Functions:AutoBuyArea()
+   end
+   if getgenv().AutoRebirth then 
+      Functions:AutoRebirth() 
+   end
+   if getgenv().AutoAscension then 
+       Functions:AutoAscension()
+   end
+   if getgenv().AutoBuyPet then 
+       Functions:AutoBuyPet()
+   end
+   if getgenv().AutoSellPet then 
+       Functions:AutoSellPet()
+   end
+   if getgenv().AutoEvolve then 
+       Functions:Evolve()
+    end
+end
+
